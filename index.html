@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sirmione 2030 — Dossier Criticità DPSIR</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;1,9..144,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&display=swap');
+
+:root {
+  --sand: #f0f4f8;
+  --sand-dark: #e2eaf2;
+  --stone: #c8d8e8;
+  --ink: #2680c2;
+  --ink-mid: #2e5070;
+  --ink-muted: #6888a0;
+  --lake: #1a5f9e;
+  --lake-light: #deeaf6;
+  --lake-mid: #7aadd4;
+  --border: #b8cfe0;
+  --gold: #ffffff;
+  --gold-light: #e8f2fa;
+  --radius: 8px;
+  --shadow: 0 2px 12px rgba(22,60,100,0.08);
+  --shadow-hover: 0 6px 24px rgba(22,60,100,0.15);
+
+  --critica: #b03025;
+  --critica-bg: #fdf0ef;
+  --alta: #b85c10;
+  --alta-bg: #fdf4ec;
+  --media: #1f7a4a;
+  --media-bg: #edf8f2;
+  --bassa: #6888a0;
+  --bassa-bg: #eef4f8;
+
+  --tab-situazione: #1a5f9e;
+  --tab-pressioni: #b85c10;
+  --tab-risposte: #1f7a4a;
+  --tab-azioni: #0e7490;
+  --tab-impatti: #6b3a9e;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(--ink-mid); font-size: 14px; line-height: 1.5; }
+
+/* ── HEADER ── */
+.site-header { background: var(--ink); padding: 0; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 16px rgba(0,0,0,0.2); }
+.header-inner { max-width: 1300px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 56px; gap: 20px; }
+.header-brand { display: flex; align-items: baseline; gap: 10px; }
+.header-brand .year { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600; color: #fff; }
+.header-brand .name { font-size: 11px; font-weight: 500; color: rgba(255,255,255,0.5); letter-spacing: 0.08em; text-transform: uppercase; }
+.sync-indicator { display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.45); }
+.sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; }
+.sync-dot.loading { background: #fbbf24; animation: pulse 1s infinite; }
+.sync-dot.error { background: #f87171; }
+@keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+.config-btn { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.7); font-size: 11px; font-weight: 500; font-family: 'DM Sans', sans-serif; padding: 5px 12px; border-radius: 6px; cursor: pointer; transition: all .15s; display: flex; align-items: center; gap: 5px; }
+.config-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+
+/* ── MAIN ── */
+.main-wrap { max-width: 1300px; margin: 0 auto; padding: 24px 24px 60px; }
+
+/* ── HERO ── */
+.hero { background: var(--ink); border-radius: var(--radius); padding: 28px 32px; margin-bottom: 20px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; }
+.hero-text h1 { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 600; color: #fff; line-height: 1.2; margin-bottom: 5px; }
+.hero-text h1 em { font-style: italic; color: rgba(255,255,255,0.65); font-weight: 300; }
+.hero-text p { font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 300; max-width: 440px; }
+.hero-stats { display: flex; gap: 24px; flex-shrink: 0; }
+.stat-pill .num { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 700; color: #fff; line-height: 1; display: block; }
+.stat-pill .lbl { font-size: 10px; color: rgba(255,255,255,0.35); text-transform: uppercase; letter-spacing: .1em; font-weight: 500; margin-top: 2px; display: block; }
+
+/* ── TOOLBAR ── */
+.toolbar { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 18px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; box-shadow: var(--shadow); }
+.search-wrap { position: relative; flex: 1; min-width: 200px; }
+.search-wrap input { width: 100%; padding: 7px 12px 7px 32px; border: 1.5px solid var(--border); border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 13px; background: var(--sand); color: var(--ink-mid); outline: none; transition: border-color .15s; }
+.search-wrap input:focus { border-color: var(--lake); }
+.search-icon { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); color: var(--ink-muted); pointer-events: none; }
+.toolbar-divider { width: 1px; height: 26px; background: var(--border); }
+.toolbar-label { font-size: 10px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .09em; white-space: nowrap; }
+.toolbar-group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+.chip { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 16px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1.5px solid transparent; transition: all .15s; user-select: none; white-space: nowrap; }
+.chip.all { background: var(--sand-dark); color: var(--ink-muted); border-color: var(--stone); }
+.chip.all.active { background: var(--ink-mid); color: #fff; border-color: var(--ink-mid); }
+.chip.critica { background: var(--critica-bg); color: var(--critica); border-color: #e8afa8; }
+.chip.critica.active { background: var(--critica); color: #fff; }
+.chip.alta { background: var(--alta-bg); color: var(--alta); border-color: #e8c49a; }
+.chip.alta.active { background: var(--alta); color: #fff; }
+.chip.media { background: var(--media-bg); color: var(--media); border-color: #9dd4b5; }
+.chip.media.active { background: var(--media); color: #fff; }
+.chip:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,.08); }
+
+.select-styled { padding: 5px 28px 5px 9px; border: 1.5px solid var(--border); border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; background: var(--sand); color: var(--ink-mid); outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236888a0'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 9px center; }
+
+.view-tabs { display: flex; gap: 2px; background: var(--sand-dark); border-radius: 6px; padding: 2px; }
+.view-tab { padding: 4px 11px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; cursor: pointer; color: var(--ink-muted); transition: all .15s; user-select: none; white-space: nowrap; }
+.view-tab.active { background: #fff; color: var(--ink-mid); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+
+/* ── RESULTS BAR ── */
+.results-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; padding: 0 2px; }
+.results-count { font-size: 12px; color: var(--ink-muted); }
+.results-count strong { color: var(--ink-mid); font-weight: 600; }
+
+/* ── ECO SECTION ── */
+.eco-section { margin-bottom: 28px; }
+.eco-header { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid var(--border); }
+.eco-badge { width: 30px; height: 30px; border-radius: 50%; background: var(--lake); color: #fff; display: flex; align-items: center; justify-content: center; font-family: 'Fraunces', serif; font-size: 14px; font-weight: 700; flex-shrink: 0; }
+.eco-badge.gov { background: var(--ink); }
+.eco-title { font-family: 'Fraunces', serif; font-size: 15px; font-weight: 600; color: var(--ink-mid); }
+.eco-count { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--ink-muted); background: var(--sand-dark); padding: 2px 8px; border-radius: 10px; }
+.card-list { display: flex; flex-direction: column; gap: 10px; }
+
+/* ── CARD ── */
+.card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); transition: box-shadow .15s; }
+.card:hover { box-shadow: var(--shadow-hover); }
+
+.card-header { display: flex; align-items: center; gap: 12px; padding: 14px 18px; cursor: pointer; user-select: none; }
+.card-header:hover { background: var(--lake-light); }
+.card-priority { width: 4px; height: 36px; border-radius: 2px; flex-shrink: 0; }
+.priority-critica { background: var(--critica); }
+.priority-alta { background: var(--alta); }
+.priority-media { background: var(--media); }
+.priority-bassa { background: var(--bassa); }
+
+.card-header-main { flex: 1; }
+.card-title { font-size: 14px; font-weight: 600; color: var(--ink-mid); line-height: 1.35; }
+.card-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+.meta-loc { font-size: 11px; color: var(--ink-muted); display: flex; align-items: center; gap: 3px; }
+.meta-fonte { font-size: 10px; color: var(--ink-muted); background: var(--sand-dark); padding: 2px 7px; border-radius: 8px; font-weight: 500; }
+.priority-badge { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 2px 8px; border-radius: 8px; }
+.priority-badge.critica { background: var(--critica-bg); color: var(--critica); }
+.priority-badge.alta { background: var(--alta-bg); color: var(--alta); }
+.priority-badge.media { background: var(--media-bg); color: var(--media); }
+.priority-badge.bassa { background: var(--bassa-bg); color: var(--bassa); }
+
+.card-toggle { font-size: 16px; color: var(--ink-muted); transition: transform .2s; flex-shrink: 0; }
+.card-toggle.open { transform: rotate(180deg); }
+
+/* ── CARD BODY (expanded) ── */
+.card-body { display: none; border-top: 1px solid var(--sand-dark); }
+.card-body.open { display: block; }
+
+/* Tabs */
+.card-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--sand); }
+.card-tab { flex: 1; padding: 9px 8px; text-align: center; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; cursor: pointer; color: var(--ink-muted); border-bottom: 2px solid transparent; transition: all .15s; }
+.card-tab:hover { color: var(--ink-mid); background: rgba(255,255,255,.5); }
+.card-tab.active { color: #fff; border-bottom-color: transparent; }
+.card-tab.tab-situazione.active { background: var(--tab-situazione); color: #fff; }
+.card-tab.tab-pressioni.active { background: var(--tab-pressioni); color: #fff; }
+.card-tab.tab-risposte.active { background: var(--tab-risposte); color: #fff; }
+.card-tab.tab-azioni.active { background: var(--tab-azioni); color: #fff; }
+.card-tab.tab-impatti.active { background: var(--tab-impatti); color: #fff; }
+
+.card-tab-icon { margin-right: 4px; }
+
+/* Tab content */
+.card-tab-content { display: none; padding: 16px 20px; }
+.card-tab-content.active { display: block; }
+
+.tab-intro { font-size: 12px; color: var(--ink-muted); margin-bottom: 10px; font-style: italic; font-weight: 300; }
+.tab-items { display: flex; flex-direction: column; gap: 6px; }
+.tab-item { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--ink-mid); line-height: 1.5; }
+.tab-item-bullet { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+.bullet-situazione { background: var(--tab-situazione); }
+.bullet-pressioni { background: var(--tab-pressioni); }
+.bullet-risposte { background: var(--tab-risposte); }
+.bullet-azioni { background: var(--tab-azioni); }
+.bullet-impatti { background: var(--tab-impatti); }
+
+.tab-item-num { font-size: 11px; font-weight: 700; color: var(--tab-risposte); flex-shrink: 0; min-width: 18px; margin-top: 1px; }
+.infra-tag { font-size: 10px; font-weight: 600; color: var(--lake); background: var(--lake-light); padding: 1px 6px; border-radius: 4px; margin-left: 4px; vertical-align: middle; }
+
+/* ── TABLE VIEW ── */
+.table-wrap { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow); }
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: var(--ink); }
+th { padding: 10px 14px; text-align: left; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.7); white-space: nowrap; }
+tbody tr { border-bottom: 1px solid var(--sand-dark); transition: background .1s; cursor: pointer; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--lake-light); }
+td { padding: 10px 14px; font-size: 12px; vertical-align: top; color: var(--ink-mid); }
+.td-title { font-weight: 600; max-width: 260px; }
+.td-eco { font-size: 11px; color: var(--ink-muted); }
+.td-loc { font-size: 11px; color: var(--ink-muted); white-space: nowrap; }
+
+/* ── TEMA VIEW ── */
+.tema-section { background: #fff; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 14px; overflow: hidden; box-shadow: var(--shadow); }
+.tema-header { padding: 13px 16px; background: var(--sand-dark); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+.tema-header-left { display: flex; align-items: center; gap: 10px; }
+.tema-icon { font-size: 17px; }
+.tema-name { font-family: 'Fraunces', serif; font-size: 14px; font-weight: 600; color: var(--ink-mid); }
+.tema-count { font-size: 11px; color: var(--ink-muted); background: var(--stone); padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+.tema-toggle { font-size: 16px; color: var(--ink-muted); transition: transform .2s; }
+.tema-toggle.open { transform: rotate(180deg); }
+.tema-body { display: none; padding: 12px; }
+.tema-body.open { display: block; }
+
+/* ── EMPTY / LOADING ── */
+.empty-state { text-align: center; padding: 60px 20px; color: var(--ink-muted); }
+.loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 20px; gap: 14px; color: var(--ink-muted); }
+.spinner { width: 32px; height: 32px; border: 3px solid var(--stone); border-top-color: var(--lake); border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── CONFIG PANEL ── */
+.config-panel { display: none; position: fixed; inset: 0; background: rgba(22,60,100,.5); z-index: 300; align-items: center; justify-content: center; padding: 20px; }
+.config-panel.open { display: flex; }
+.config-box { background: #fff; border-radius: 10px; padding: 26px 30px; max-width: 540px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+.config-box h2 { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; margin-bottom: 5px; color: var(--ink-mid); }
+.config-box p { font-size: 12px; color: var(--ink-muted); margin-bottom: 16px; line-height: 1.6; font-weight: 300; }
+.config-box label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--ink-muted); margin-bottom: 5px; }
+.config-box input[type="text"] { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink-mid); background: var(--sand); outline: none; margin-bottom: 14px; }
+.config-box input[type="text"]:focus { border-color: var(--lake); }
+.config-help { background: var(--lake-light); border: 1px solid var(--lake-mid); border-radius: 6px; padding: 11px 13px; margin-bottom: 16px; }
+.config-help ol { padding-left: 15px; font-size: 12px; color: var(--lake); line-height: 1.8; }
+.config-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.btn { padding: 8px 18px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; border: none; transition: all .15s; }
+.btn-primary { background: var(--lake); color: #fff; }
+.btn-primary:hover { background: #144d82; }
+.btn-ghost { background: var(--sand-dark); color: var(--ink-mid); border: 1px solid var(--border); }
+
+@media (max-width: 680px) {
+  .main-wrap { padding: 14px 12px 40px; }
+  .hero { flex-direction: column; gap: 16px; padding: 20px 18px; }
+  .card-tabs { flex-wrap: wrap; }
+  .card-tab { flex: none; width: 50%; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <span class="year">Sirmione 2030</span>
+      <span class="name">Dossier Criticità DPSIR</span>
+    </div>
+    <div class="header-right">
+      <div class="sync-indicator">
+        <div class="sync-dot loading" id="syncDot"></div>
+        <span id="syncText">Connessione...</span>
+      </div>
+      <button class="config-btn" onclick="openConfig()">
+        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+        Configura sorgente
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- CONFIG -->
+<div class="config-panel" id="configPanel">
+  <div class="config-box">
+    <h2>Configura Google Sheet</h2>
+    <p>Incolla l'URL del Google Sheet pubblicato come CSV. La dashboard leggerà i dati in tempo reale.</p>
+    <div class="config-help">
+      <ol>
+        <li>Apri il Google Sheet → <strong>File → Condividi → Pubblica sul web</strong></li>
+        <li>Seleziona il foglio e il formato <strong>CSV</strong></li>
+        <li>Clicca <strong>Pubblica</strong> e copia l'URL</li>
+      </ol>
+    </div>
+    <label>URL Google Sheet (CSV)</label>
+    <input type="text" id="sheetUrlInput" placeholder="https://docs.google.com/spreadsheets/d/.../pub?output=csv" />
+    <div class="config-actions">
+      <button class="btn btn-ghost" onclick="closeConfig()">Annulla</button>
+      <button class="btn btn-primary" onclick="saveConfig()">Salva e carica dati</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="main-wrap">
+  <div class="hero">
+    <div class="hero-text">
+      <h1>Mappa delle Criticità <em>e delle Proposte</em></h1>
+      <p>Clicca su ogni criticità per vedere situazione, pressioni, risposte e impatti attesi.</p>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-pill"><span class="num" id="statTotal">—</span><span class="lbl">Criticità</span></div>
+      <div class="stat-pill"><span class="num" id="statEco">5</span><span class="lbl">Ecosistemi</span></div>
+      <div class="stat-pill"><span class="num" id="statCritiche">—</span><span class="lbl">Priorità critica</span></div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-wrap">
+      <svg class="search-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchInput" placeholder="Cerca per titolo, localizzazione, tema…" oninput="applyFilters()">
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <span class="toolbar-label">Priorità</span>
+      <div class="chip all active" onclick="setPrioFilter('all',this)">Tutte</div>
+      <div class="chip critica" onclick="setPrioFilter('critica',this)">Critica</div>
+      <div class="chip alta" onclick="setPrioFilter('alta',this)">Alta</div>
+      <div class="chip media" onclick="setPrioFilter('media',this)">Media</div>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="toolbar-group">
+      <span class="toolbar-label">Tema</span>
+      <select class="select-styled" id="temaFilter" onchange="applyFilters()">
+        <option value="all">Tutti i temi</option>
+      </select>
+    </div>
+    <div class="toolbar-divider"></div>
+    <div class="view-tabs">
+      <div class="view-tab active" onclick="setView('ecosistema',this)">Ecosistema</div>
+      <div class="view-tab" onclick="setView('tabella',this)">Tabella</div>
+      <div class="view-tab" onclick="setView('tema',this)">Tema</div>
+    </div>
+  </div>
+
+  <div class="results-bar">
+    <div class="results-count" id="resultsCount"></div>
+  </div>
+
+  <div id="contentArea"></div>
+</main>
+
+<script>
+const STORAGE_KEY = 'sirmione2_sheet_url';
+let SHEET_URL = localStorage.getItem(STORAGE_KEY) || 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQKjsblMU0VZ8mwpG0E4Hxya9W6pZ9-ecl5blrWqHs7CEuoR_PCjdwOrcyu6-iPaFXPAEiH0o9VsNqi/pub?gid=584098234&single=true&output=csv';
+let allData = [], filteredData = [];
+let currentPrio = 'all', currentView = 'ecosistema';
+
+const ECOSISTEMI = [
+  {num:1, name:'Accesso Bagnera / Via Verona / Monte Baldo'},
+  {num:2, name:'Colombare / Piazzale Europa'},
+  {num:3, name:'Centro Storico / Ponte Scaligero'},
+  {num:4, name:'Lungolago / Punta Grò / Galeazzi'},
+  {num:5, name:'Sistema complessivo / Governance', isGov:true},
+];
+const TEMI = ['Mobilità & Accessi','Sicurezza & Emergenze','Decoro & Manutenzione','Spazi Pubblici','Qualità della Vita','Governance'];
+const TEMA_ICONS = {'Mobilità & Accessi':'🚗','Sicurezza & Emergenze':'🚨','Decoro & Manutenzione':'🔧','Spazi Pubblici':'🌿','Qualità della Vita':'👥','Governance':'🏛️'};
+
+// ── FALLBACK DATA ──
+const FALLBACK = [
+  {id:'E1-1',ecosistema:'Accesso Bagnera / Via Verona / Monte Baldo',eco_num:1,criticita:'Congestione e blocchi ricorrenti all\'accesso della penisola (10–17)',spiegazione:'• Difficoltà costante a muoversi nelle ore centrali della giornata (10–17)\n• Percezione di caos e disorientamento all\'ingresso\n• Peggioramento qualità dell\'esperienza di arrivo',pressioni:'• Afflusso simultaneo non regolato\n• Mancanza modulazione accessi in base a saturazione\n• Occupazione impropria fermate bus/linea (auto e navette che sostano)\n• Bivacchi e assembramenti nelle aree di attesa navetta (Colombare)\n• Promiscuità pedoni–bici–monopattini nelle aree di transito\n• Segnaletica inefficace / danneggiata vicino ai punti di snodo\n• Concentrazione dei bus turistici tra le 10 e le 13 (30–40 mezzi)\n• Sbarchi Navigarda nelle stesse fasce orarie con flussi pedonali non coordinati',risposte:'1. ZTL dinamica Bagnera–Colombare basata su saturazione parcheggi\n2. Varco elettronico ANPR e presidio fisso nei weekend\n3. Pannelli dinamici e App Mobilità Sirmione con dati reali\n4. Riorganizzazione aree di attesa navette e bus (no bivacchi)\n5. Controlli sosta irregolare alle fermate bus/linea\n6. [Infrastruttura] Nuovo parcheggio multipiano Bagnera intermodale',impatti:'• Sicurezza e vivibilità residenti\n• Riduzione code e tempi di attraversamento\n• Migliore percezione ordine/accoglienza',localizzazione:'Bagnera / Via Verona',fonte:'Sintesi DPSIR',tema:'Mobilità & Accessi',priorita:'Critica'},
+  {id:'E1-2',ecosistema:'Accesso Bagnera / Via Verona / Monte Baldo',eco_num:1,criticita:'Saturazione capacità di sosta e gestione disordinata bus/NCC/navette',spiegazione:'• Assenza di prenotazione/contingentamento per bus turistici e navette\n• Soste prolungate delle navette per vendita/controllo biglietti\n• Stalli bus occupati o insufficienti\n• Mancanza di spazi drop-off ordinati',pressioni:'• Assenza prenotazione/contingentamento\n• Soste prolungate navette per vendita/controllo biglietti\n• Stalli bus occupati/insufficienti\n• Mancanza spazi drop-off ordinati',risposte:'1. Prenotazione obbligatoria bus turistici e slot orari digitali\n2. Eliminazione soste navette per bigliettazione (digital ticketing)\n3. Corsie e stalli dedicati bus/NCC/navette\n4. [Infrastruttura] Riqualificazione parcheggi Tiglio e Brescia–Comunità Europea',impatti:'• Riduzione disagi residenti/dipendenti\n• Minor congestione nelle aree di ingresso',localizzazione:'Bagnera / Monte Baldo',fonte:'Sintesi DPSIR',tema:'Mobilità & Accessi',priorita:'Alta'},
+  {id:'E1-3',ecosistema:'Accesso Bagnera / Via Verona / Monte Baldo',eco_num:1,criticita:'Vulnerabilità del sistema di accesso nei picchi/emergenze',spiegazione:'• Forte ansia per rischio ambulanza bloccata\n• Residenti evitano di uscire negli orari critici\n• Unico ponte di accesso: single point of failure',pressioni:'• Assenza piano emergenza viaria\n• Unico ponte di accesso → single point of failure\n• Rallentamenti generati da bici/monopattini nelle strettoie',risposte:'1. Piano operativo emergenze traffico\n2. Corsie preferenziali mezzi di soccorso\n3. Limitazioni bici/monopattini nelle ore critiche\n4. Control Room weekend alta affluenza',impatti:'• Migliore sicurezza pubblica\n• Riduzione rischio ritardi emergenze',localizzazione:'Ponte Scaligero / Accesso penisola',fonte:'Sintesi DPSIR',tema:'Sicurezza & Emergenze',priorita:'Critica'},
+  {id:'E1-4',ecosistema:'Accesso Bagnera / Via Verona / Monte Baldo',eco_num:1,criticita:'Esperienza d\'arrivo percepita come disordinata e poco chiara',spiegazione:'• Segnaletica poco visibile o danneggiata\n• Zone di attesa navetta usate come aree di bivacco\n• Impressione di paese sporco nei picchi',pressioni:'• Segnaletica degradata o incoerente\n• Mancanza di personale accoglienza alle entrate\n• Carenza servizi base (WC, panchine) vicino accesso\n• Rifiuti e degrado nelle aree adiacenti alle fermate',risposte:'1. Segnaletica turistica integrata e manutenzione periodica\n2. Presidio accoglienza nei weekend\n3. Installazione servizi igienici e sedute nelle aree di attesa\n4. Rafforzamento pulizia nelle ore di picco',impatti:'• Migliore reputazione destinazione\n• Riduzione stress visitatori e residenti',localizzazione:'Colombare / Aree di attesa navetta',fonte:'Sintesi DPSIR',tema:'Decoro & Manutenzione',priorita:'Media'},
+  {id:'E1-5',ecosistema:'Accesso Bagnera / Via Verona / Monte Baldo',eco_num:1,criticita:'Pressione sociale e stress dei residenti legati all\'accesso',spiegazione:'• Residenti evitano di entrare/uscire tra le 10 e le 17\n• Aumento conflitti residenti–turisti nelle aree di accesso',pressioni:'• Sovraffollamento ricorrente\n• Mancanza regole chiare di convivenza\n• Presidio PL insufficiente nei momenti chiave',risposte:'1. Presenza PL potenziata (10–17)\n2. Regolamento convivenza + sanzioni comportamenti incivili\n3. Campagne educative multilingue\n4. Coordinamento PL–Sirmione Servizi–Navette',impatti:'• Riduzione segnalazioni di conflitti\n• Migliore qualità della vita\n• Minori disservizi percepiti',localizzazione:'Colombare / Via Verona',fonte:'Sintesi DPSIR',tema:'Qualità della Vita',priorita:'Alta'},
+  {id:'E2-1',ecosistema:'Colombare / Piazzale Europa',eco_num:2,criticita:'Saturazione parcheggi e difficoltà di sosta per residenti e lavoratori',spiegazione:'• Residenti spesso impossibilitati a parcheggiare nelle vie interne\n• Le aree per la navetta diventano bivacco con persone sedute ovunque',pressioni:'• Elevato uso dei parcheggi da parte dei turisti giornalieri\n• Mancanza di stalli dedicati ai residenti nelle vie laterali\n• Aree navetta collocate nel cuore di Colombare\n• Scarsa affidabilità dei pannelli informativi genera comportamenti errati',risposte:'1. Permessi digitali per residenti/dipendenti\n2. Introduzione aree residenti nelle vie laterali\n3. Riposizionamento area navetta verso zone meno centrali (es. ex Bowling)\n4. [Infrastruttura] Rafforzamento parcheggi interscambio (Tiglio, Brescia–C.E.)',impatti:'• Maggiore vivibilità residenti\n• Riduzione traffico da ricerca posto\n• Meno affollamento disordinato',localizzazione:'Colombare / Piazzale Europa',fonte:'Sintesi DPSIR',tema:'Mobilità & Accessi',priorita:'Alta'},
+  {id:'E2-2',ecosistema:'Colombare / Piazzale Europa',eco_num:2,criticita:'Traffico diffuso e sosta irregolare nelle ore di punta',spiegazione:'• Bus di linea costretti a fermarsi in mezzo alla strada (via Roma)\n• Formazione di code che rallentano l\'intero asse Colombare–Bagnera',pressioni:'• Fermate bus occupate da auto o navette\n• Soste lunghe delle navette per vendita/vidimazione biglietti\n• Mancanza di controllo PL nelle fasce a rischio',risposte:'1. Controlli PL mirati alle fermate bus\n2. Digital ticketing per navetta\n3. Segnaletica posti liberi dai nodi di accesso\n4. Navetta potenziata e più frequente nei picchi',impatti:'• Viabilità più ordinata\n• Riduzione code a fisarmonica\n• Minori ritardi del trasporto pubblico',localizzazione:'Via Roma / Asse Colombare',fonte:'Sintesi DPSIR',tema:'Mobilità & Accessi',priorita:'Alta'},
+  {id:'E2-3',ecosistema:'Colombare / Piazzale Europa',eco_num:2,criticita:'Promiscuità traffico turistico / residenti / bici / monopattini',spiegazione:'• Pericolosità per pedoni soprattutto nei fine settimana\n• Conflitti fisici tra mezzi e pedoni in aree strette',pressioni:'• Mancanza micro-viabilità dedicata\n• Bici e monopattini a velocità elevata\n• Assenza percorsi sicuri verso Punta Grò e lungolago',risposte:'1. Zone 30 e aree di sosta breve per logistica\n2. Limitazioni velocità bici/monopattini e segnaletica dedicata\n3. Collegamento sicuro percorsi pedonali-ciclabili Colombare–Lungolago',impatti:'• Riduzione conflitti pedoni/mezzi\n• Migliore sicurezza stradale',localizzazione:'Via Roma / Asse Colombare',fonte:'Sintesi DPSIR',tema:'Sicurezza & Emergenze',priorita:'Alta'},
+  {id:'E2-4',ecosistema:'Colombare / Piazzale Europa',eco_num:2,criticita:'Degrado percepito e carenze manutentive',spiegazione:'• Segnaletica danneggiata o inclinata che disorienta turisti\n• Marciapiedi sconnessi, buche e tombini pericolosi',pressioni:'• Mancanza manutenzione regolare\n• Alta pressione d\'uso durante i weekend\n• Assenza infrastrutture adeguate all\'attesa navetta',risposte:'1. Piano manutenzione urbana continua (marciapiedi, tombini, cartelli)\n2. Installazione pensiline e sedute nelle aree navetta\n3. App decoro per segnalazioni residenti',impatti:'• Migliore decoro urbano\n• Riduzione incidenti pedonali',localizzazione:'Colombare',fonte:'Sintesi DPSIR',tema:'Decoro & Manutenzione',priorita:'Media'},
+  {id:'E2-5',ecosistema:'Colombare / Piazzale Europa',eco_num:2,criticita:'Servizi pubblici percepiti come insufficienti',spiegazione:'• Mancanza di bagni pubblici nelle aree di maggiore attesa navetta\n• Aree verdi con scarsa manutenzione che diventano punti di conflitto',pressioni:'• Insufficiente dotazione infrastrutturale (WC, fontanelle, panchine)\n• Elevata affluenza non bilanciata da servizi adeguati',risposte:'1. Installazione servizi igienici presso le aree navetta e parcheggi\n2. Punti acqua e sedute nei nodi di interscambio\n3. Monitoraggio pulizia e decoro tramite app',impatti:'• Miglioramento comfort utenti\n• Riduzione uso improprio spazi pubblici',localizzazione:'Colombare / Piazzale Europa',fonte:'Sintesi DPSIR',tema:'Spazi Pubblici',priorita:'Media'},
+  {id:'E2-6',ecosistema:'Colombare / Piazzale Europa',eco_num:2,criticita:'Carico sociale elevato e impatto sulla qualità di vita dei residenti',spiegazione:'• Residenti evitano di uscire nelle ore di punta\n• Conflitti tra gruppi (giovani residenti e turisti)',pressioni:'• Alta densità pedonale/veicolare nei picchi\n• Mancanza regole chiare di convivenza\n• Spazi pubblici non presidiati (Piazza Durighello, parco giochi)',risposte:'1. Regolamento convivenza e presidio PL nei picchi\n2. Mediazione sociale e prevenzione conflitti\n3. Eventi per aumentare presidio positivo nelle aree sensibili',impatti:'• Riduzione segnalazioni di conflitto\n• Migliore percezione sicurezza\n• Riequilibrio uso spazi pubblici',localizzazione:'Piazza Durighello / Parco giochi',fonte:'Sintesi DPSIR',tema:'Qualità della Vita',priorita:'Alta'},
+  {id:'E3-1',ecosistema:'Centro Storico / Ponte Scaligero',eco_num:3,criticita:'Sovraffollamento pedonale e rischio sicurezza (11–17)',spiegazione:'• Congestione grave tra Castello, Piazza Flaminia e Porto Valentino negli orari 11–17\n• Residenti evitano queste zone nei picchi\n• Promiscuità pedoni–bici–monopattini che genera forte ansia',pressioni:'• Unico varco di attraversamento pedonale (ponte)\n• Arrivi concentrati bus/navette senza filtro\n• Mancanza percorsi differenziati entrata/uscita\n• Comportamenti incivili e scarsa consapevolezza dei turisti',risposte:'1. Canalizzazione flussi (entrata Via Dante / uscita Lungolago Diaz)\n2. Presenza personale dedicato nei picchi\n3. Sensori di affollamento e monitoraggio real-time\n4. Limitazione accesso bici/monopattini nelle aree dense',impatti:'• Sicurezza e comfort pedoni\n• Migliore scorrimento flussi\n• Riduzione tensioni e stress',localizzazione:'Castello / Piazza Flaminia / Porto Valentino',fonte:'Sintesi DPSIR',tema:'Sicurezza & Emergenze',priorita:'Critica'},
+  {id:'E3-2',ecosistema:'Centro Storico / Ponte Scaligero',eco_num:3,criticita:'Ponte unico come collo di bottiglia strutturale',spiegazione:'• Residenti segnalano forte ansia per possibili blocchi (ambulanze, emergenze)\n• Nei 3–4 giorni più critici dell\'anno è difficile attraversare anche a piedi',pressioni:'• Dipendenza totale dal ponte Scaligero per attraversamento\n• Crescente afflusso non regolarizzato\n• Presenza plateatici e pedoni che rallentano il varco',risposte:'1. [Infrastruttura] Nuovo ponte pedonale al porticciolo (Studio Mobilità)\n2. Valutazione paesaggistica/ambientale Soprintendenza\n3. Integrazione con rete ciclopedonale',impatti:'• Decongestione ponte storico\n• Maggiore resilienza del sistema\n• Miglioramento immagine e qualità',localizzazione:'Ponte Scaligero',fonte:'Sintesi DPSIR / Studio Mobilità',tema:'Sicurezza & Emergenze',priorita:'Critica'},
+  {id:'E3-3',ecosistema:'Centro Storico / Ponte Scaligero',eco_num:3,criticita:'Accessibilità limitata per persone fragili e ospiti con bagagli',spiegazione:'• Percezione di percorso difficile tra ingresso e hotel\n• Doppio trasbordo navetta–hotel vissuto come disagio da molte strutture',pressioni:'• Barriere fisiche e spazi stretti\n• Mancanza aree drop-off agevoli per hotel/terme\n• Chiusure ZTL non sempre coordinate',risposte:'1. Drop-off dedicati per hotel/terme\n2. Accesso prioritario taxi/NCC/disabili\n3. Segnaletica easy access\n4. Revisione procedure navetta per ospiti hotel',impatti:'• Migliore esperienza ospiti fragili\n• Riduzione reclami strutture ricettive',localizzazione:'Centro Storico / Terme Catullo',fonte:'Sintesi DPSIR',tema:'Qualità della Vita',priorita:'Alta'},
+  {id:'E3-4',ecosistema:'Centro Storico / Ponte Scaligero',eco_num:3,criticita:'Perdita di vivibilità per residenti e attività',spiegazione:'• Residenti dichiarano che non si riconoscono più nel proprio paese\n• Aree pubbliche percepite come non vivibili nei picchi\n• Plateatici molto estesi percepiti come invasivi',pressioni:'• Overturismo giornaliero e accessi incontrollati\n• Mancanza regole certe per attività (plateatici, consumazioni)\n• Interferenza tra spazi commerciali e flussi pedonali',risposte:'1. Requisiti più stringenti per plateatici e rispetto spazi comuni\n2. Orari contingentati consegne e badge digitali\n3. Leadership PL nei punti critici\n4. Comunicazione regole chiare a operatori e turisti',impatti:'• Ripristino equilibrio urbano\n• Miglior convivenza residenti–operatori\n• Riduzione conflitti comportamentali',localizzazione:'Centro Storico',fonte:'Sintesi DPSIR',tema:'Qualità della Vita',priorita:'Alta'},
+  {id:'E3-5',ecosistema:'Centro Storico / Ponte Scaligero',eco_num:3,criticita:'Decoro e qualità urbana compromessi',spiegazione:'• Parchi e spiagge del centro senza controllo\n• Aiuole, scale e muretti usati per picnic/consumo cibo\n• Degrado percepito come nuovo stato normale',pressioni:'• Mancanza presidio nelle ore di punta\n• Carenza cestini, WC pubblici e punti acqua\n• Scarsa consapevolezza del contesto storico',risposte:'1. Punti informazione fisici e digitali all\'ingresso (QR code regole)\n2. Aumento cestini, WC, manutenzione rapida\n3. Presidio cooperative decoro nei weekend\n4. Campagna Centro Storico è patrimonio fragile',impatti:'• Migliore immagine del Centro Storico\n• Riduzione rifiuti e uso improprio spazi\n• Migliore valutazione da residenti e turisti',localizzazione:'Parchi e spiagge Centro Storico',fonte:'Sintesi DPSIR',tema:'Decoro & Manutenzione',priorita:'Media'},
+  {id:'E3-6',ecosistema:'Centro Storico / Ponte Scaligero',eco_num:3,criticita:'Percezione di insicurezza sociale',spiegazione:'• Conflitti frequenti tra turisti e residenti (urti, spintoni, litigi)\n• Residenti evitano il Centro nelle ore 11–17',pressioni:'• Densità oltre soglia\n• Assenza filtri all\'ingresso\n• Mancanza di regole di convivenza e presidio',risposte:'1. Regolamento convivenza (picnic, decoro, mobilità leggera)\n2. Task force PL nei giorni bollino rosso\n3. Pannelli informativi multilingue sulle regole',impatti:'• Riduzione conflitti\n• Migliore percezione sicurezza\n• Minore fuga dei residenti',localizzazione:'Centro Storico',fonte:'Sintesi DPSIR',tema:'Sicurezza & Emergenze',priorita:'Alta'},
+  {id:'E4-1',ecosistema:'Lungolago / Punta Grò / Galeazzi',eco_num:4,criticita:'Degrado e insicurezza passerelle e percorsi ciclopedonali',spiegazione:'• Passerelle danneggiate, scivolose, poco illuminate (Punta Grò, San Vito, Galeazzi)\n• Pericolo per pedoni e ciclisti con casi di cadute segnalati',pressioni:'• Manutenzione insufficiente\n• Alta pressione turistica soprattutto nei weekend\n• Promiscuità bici/monopattini/pedoni nei tratti stretti',risposte:'1. Manutenzione straordinaria passerelle e verifica strutturale\n2. Installazione materiali antiscivolo e illuminazione contapassi\n3. Limitazione velocità bici/monopattini e dissuasori nei tratti pedonali\n4. [Infrastruttura] Collegamenti sicuri via Colombare–Coorti Romane',impatti:'• Sicurezza utenti e famiglie\n• Riduzione incidenti\n• Migliore fruibilità percorsi',localizzazione:'Punta Grò / San Vito / Galeazzi',fonte:'Sintesi DPSIR',tema:'Decoro & Manutenzione',priorita:'Alta'},
+  {id:'E4-2',ecosistema:'Lungolago / Punta Grò / Galeazzi',eco_num:4,criticita:'Accessibilità limitata e carenza servizi base',spiegazione:'• Mancanza WC, fontanelle, sedute nei punti più frequentati\n• Aree verdi degradate e prive di presidio (Brema, Punta Grò, Lido)',pressioni:'• Dotazione infrastrutturale inadeguata\n• Elevato afflusso giornaliero non bilanciato da servizi\n• Mancanza presidi nelle aree lacustri',risposte:'1. Nuovi bagni pubblici, fontanelle, sedute in punti strategici\n2. Gestione decoro tramite cooperative stagionali\n3. Aumento cestini e raccolta rifiuti nelle fasce di picco\n4. [Infrastruttura] Attraversamenti pedonali sicuri via Brescia/Matteotti',impatti:'• Migliore immagine destinazione\n• Migliore soddisfazione residenti/turisti\n• Riduzione comportamenti impropri (picnic, bivacchi)',localizzazione:'Lungolago / Punta Grò / Lido',fonte:'Sintesi DPSIR',tema:'Spazi Pubblici',priorita:'Media'},
+  {id:'E4-3',ecosistema:'Lungolago / Punta Grò / Galeazzi',eco_num:4,criticita:'Sovraffollamento e conflitti tra usi diversi dello spazio',spiegazione:'• Conflitti tra turisti e residenti (rumori, musica, schiamazzi)\n• Parchi e spiagge usati impropriamente da gruppi',pressioni:'• Mancanza regolazione comportamenti\n• Assenza presidio PL nelle ore critiche\n• Mancanza aree alternative per distribuzione flussi',risposte:'1. Presidio PL e stewarding nei giorni di picco\n2. Campagna Rispetta il Lago con regole chiare multilingue\n3. Aree quiet zone per residenti\n4. Eventi outdoor programmati per distribuire flussi',impatti:'• Miglior convivenza residenti–turisti\n• Riduzione segnalazioni di disturbo\n• Valorizzazione delle aree naturali',localizzazione:'Spiagge / Parchi / Lungolago',fonte:'Sintesi DPSIR',tema:'Qualità della Vita',priorita:'Alta'},
+  {id:'E4-4',ecosistema:'Lungolago / Punta Grò / Galeazzi',eco_num:4,criticita:'Scarso utilizzo dei percorsi alternativi (Park & Walk / Park & Ride)',spiegazione:'• I percorsi ciclabili/pedonali verso il Centro non vengono percepiti come sicuri o piacevoli\n• Residenti segnalano pericoli nei punti di immissione',pressioni:'• Comunicazione insufficiente\n• Percorsi poco curati o interrotti\n• Mancanza incentivi per lasciare l\'auto',risposte:'1. Segnaletica Park & Walk/Ride chiara dai parcheggi\n2. Campagna Lascia l\'auto e scopri il lago\n3. Incentivi (es. sconto navetta, benefit strutture ricettive)\n4. Eventi a mobilità dolce nelle aree lacustri',impatti:'• Riduzione uso veicoli privati\n• Aumento mobilità lenta\n• Decongestionamento Centro Storico',localizzazione:'Parcheggi periferici / Percorsi lacustri',fonte:'Sintesi DPSIR',tema:'Mobilità & Accessi',priorita:'Media'},
+  {id:'E5-1',ecosistema:'Sistema complessivo / Governance',eco_num:5,criticita:'Frammentazione decisionale e comunicativa',spiegazione:'• Canali non coordinati tra enti\n• Assenza di regia unitaria nelle decisioni operative e di comunicazione',pressioni:'• Canali non coordinati tra enti\n• Assenza regia unitaria',risposte:'1. Cabina di Regia permanente (Comune–PL–Sirmione Servizi–Associazioni–Residenti–Artigiani)\n2. Canale digitale unico (App, Telegram, dashboard)\n3. Agenda condivisa',impatti:'• Decisioni più rapide e condivise',localizzazione:'Tutto il territorio',fonte:'Sintesi DPSIR',tema:'Governance',priorita:'Alta'},
+  {id:'E5-2',ecosistema:'Sistema complessivo / Governance',eco_num:5,criticita:'Mancanza sistema dati integrato',spiegazione:'• Raccolta dati frammentata tra enti\n• Assenza di dashboard condivisa su flussi, sosta, traffico, affollamento',pressioni:'• Raccolta frammentata\n• Assenza dashboard condivisa',risposte:'1. Dashboard DPSIR pubblica (flussi, sosta, traffico, affollamento)\n2. Data sharing agreement tra enti\n3. [Infrastruttura] Sistema GIS mobilità integrato con PGTU/PUMS Garda Sud',impatti:'• Trasparenza decisionale\n• Pianificazione basata su evidenze\n• Maggiore accountability',localizzazione:'Tutto il territorio',fonte:'Sintesi DPSIR',tema:'Governance',priorita:'Alta'},
+  {id:'E5-3',ecosistema:'Sistema complessivo / Governance',eco_num:5,criticita:'Scarsa cultura operativa condivisa',spiegazione:'• Mancanza di formazione condivisa tra enti\n• Assenza di protocolli operativi nei momenti di picco',pressioni:'• Mancanza formazione e mediazione',risposte:'1. Workshop formativi annuali per PL, operatori, strutture\n2. Manuale operativo accesso e sosta\n3. Sessioni di mediazione e feedback',impatti:'• Aumento fiducia reciproca\n• Migliore rispetto delle regole\n• Riduzione conflitti',localizzazione:'Tutto il territorio',fonte:'Sintesi DPSIR',tema:'Governance',priorita:'Media'},
+];
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (SHEET_URL) loadFromSheet(); else loadFallback();
+});
+
+function loadFallback() {
+  allData = FALLBACK;
+  setSyncStatus('ok', 'Dati documento originale — configura Sheet per aggiornamenti');
+  initUI();
+}
+
+async function loadFromSheet() {
+  setSyncStatus('loading', 'Caricamento...');
+  try {
+    const r = await fetch(SHEET_URL);
+    if (!r.ok) throw new Error();
+    const csv = await r.text();
+    const parsed = parseCSV(csv);
+    if (!parsed.length) throw new Error();
+    allData = parsed;
+    setSyncStatus('ok', `${allData.length} criticità · ${new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'})}`);
+    initUI();
+  } catch {
+    allData = FALLBACK;
+    setSyncStatus('error', 'Errore Sheet — uso dati documento');
+    initUI();
+  }
+}
+
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase());
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = parseCSVLine(lines[i]);
+    if (vals.length < 3) continue;
+    const row = {};
+    headers.forEach((h,idx) => { row[h] = (vals[idx]||'').trim(); });
+    if (row.criticita || row.titolo) rows.push({
+      id: row.id || `R${i}`,
+      ecosistema: row.ecosistema || '',
+      eco_num: parseInt(row.eco_num||'0')||0,
+      criticita: row.criticita || row.titolo || '',
+      spiegazione: row.spiegazione || '',
+      pressioni: row.pressioni || '',
+      risposte: row.risposte || '',
+      azioni_in_corso: row.azioni_in_corso || '',
+      impatti: row.impatti || '',
+      localizzazione: row.localizzazione || '',
+      fonte: row.fonte || '',
+      tema: row.tema || '',
+      priorita: row.priorita || '',
+    });
+  }
+  return rows;
+}
+
+function parseCSVLine(line) {
+  const result=[]; let cur='', inQ=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+    else if(c===','&&!inQ){result.push(cur);cur='';}
+    else cur+=c;
+  }
+  result.push(cur);
+  return result;
+}
+
+function initUI() {
+  populateTemaFilter();
+  applyFilters();
+  updateStats();
+}
+
+function setPrioFilter(prio, el) {
+  currentPrio = prio;
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  applyFilters();
+}
+
+function applyFilters() {
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const tema = document.getElementById('temaFilter').value;
+  filteredData = allData.filter(r => {
+    const p = (r.priorita||'').toLowerCase();
+    if (currentPrio !== 'all' && p !== currentPrio) return false;
+    if (tema !== 'all' && r.tema !== tema) return false;
+    if (search) {
+      const hay = [r.criticita,r.spiegazione,r.localizzazione,r.ecosistema,r.tema,r.fonte].join(' ').toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+  const cnt = document.getElementById('resultsCount');
+  cnt.innerHTML = `<strong>${filteredData.length}</strong> criticità su ${allData.length} totali`;
+  renderView();
+}
+
+function populateTemaFilter() {
+  const temi = [...new Set(allData.map(r=>r.tema).filter(Boolean))].sort();
+  const sel = document.getElementById('temaFilter');
+  temi.forEach(t => { const o=document.createElement('option'); o.value=t; o.textContent=t; sel.appendChild(o); });
+}
+
+function updateStats() {
+  document.getElementById('statTotal').textContent = allData.length;
+  document.getElementById('statCritiche').textContent = allData.filter(r=>(r.priorita||'').toLowerCase()==='critica').length;
+}
+
+function setView(view, el) {
+  currentView = view;
+  document.querySelectorAll('.view-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  renderView();
+}
+
+function renderView() {
+  const area = document.getElementById('contentArea');
+  if (!filteredData.length) { area.innerHTML = `<div class="empty-state"><p>Nessun risultato per i filtri selezionati.</p></div>`; return; }
+  if (currentView === 'ecosistema') renderEcosistema(area);
+  else if (currentView === 'tabella') renderTabella(area);
+  else renderTema(area);
+}
+
+function renderEcosistema(area) {
+  let html = '';
+  ECOSISTEMI.forEach(eco => {
+    const rows = filteredData.filter(r => r.eco_num == eco.num);
+    if (!rows.length) return;
+    const badge = eco.isGov ? '⚙' : eco.num;
+    html += `<div class="eco-section">
+      <div class="eco-header">
+        <div class="eco-badge ${eco.isGov?'gov':''}">${badge}</div>
+        <div class="eco-title">${eco.name}</div>
+        <div class="eco-count">${rows.length} criticità</div>
+      </div>
+      <div class="card-list">`;
+    rows.forEach(row => { html += buildCard(row); });
+    html += `</div></div>`;
+  });
+  area.innerHTML = html;
+}
+
+function renderTabella(area) {
+  let rows = '';
+  filteredData.forEach((row,i) => {
+    const p = (row.priorita||'').toLowerCase();
+    rows += `<tr onclick="expandCard('card-${row.id}')">
+      <td><span class="priority-badge ${p}">${row.priorita}</span></td>
+      <td class="td-title">${esc(row.criticita)}</td>
+      <td class="td-eco">${esc(row.ecosistema)}</td>
+      <td class="td-loc">${esc(row.localizzazione)}</td>
+      <td class="td-loc">${esc(row.tema)}</td>
+    </tr>`;
+  });
+  area.innerHTML = `<div class="table-wrap"><table>
+    <thead><tr><th>Priorità</th><th>Criticità</th><th>Ecosistema</th><th>Localizzazione</th><th>Tema</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table></div>`;
+}
+
+function renderTema(area) {
+  let html = '';
+  TEMI.forEach(tema => {
+    const rows = filteredData.filter(r => r.tema === tema);
+    if (!rows.length) return;
+    const icon = TEMA_ICONS[tema] || '📌';
+    html += `<div class="tema-section">
+      <div class="tema-header" onclick="toggleTema(this)">
+        <div class="tema-header-left">
+          <span class="tema-icon">${icon}</span>
+          <span class="tema-name">${tema}</span>
+          <span class="tema-count">${rows.length}</span>
+        </div>
+        <span class="tema-toggle open">▾</span>
+      </div>
+      <div class="tema-body open">
+        <div class="card-list">`;
+    rows.forEach(row => { html += buildCard(row); });
+    html += `</div></div></div>`;
+  });
+  area.innerHTML = html;
+}
+
+function toggleTema(header) {
+  const body = header.nextElementSibling;
+  const toggle = header.querySelector('.tema-toggle');
+  body.classList.toggle('open');
+  toggle.classList.toggle('open');
+}
+
+function buildCard(row) {
+  const p = (row.priorita||'media').toLowerCase();
+  const cardId = `card-${row.id}`;
+  return `<div class="card" id="${cardId}">
+    <div class="card-header" onclick="toggleCard('${cardId}')">
+      <div class="card-priority priority-${p}"></div>
+      <div class="card-header-main">
+        <div class="card-title">${esc(row.criticita)}</div>
+        <div class="card-meta">
+          <span class="meta-loc">
+            <svg width="10" height="10" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            ${esc(row.localizzazione)}
+          </span>
+          <span class="meta-fonte">${esc(row.fonte)}</span>
+          <span class="priority-badge ${p}">${row.priorita}</span>
+        </div>
+      </div>
+      <div class="card-toggle" id="toggle-${cardId}">▾</div>
+    </div>
+    <div class="card-body" id="body-${cardId}">
+      <div class="card-tabs">
+        <div class="card-tab tab-situazione active" onclick="switchTab('${cardId}','situazione',this)">
+          <span class="card-tab-icon">📋</span>Situazione
+        </div>
+        <div class="card-tab tab-pressioni" onclick="switchTab('${cardId}','pressioni',this)">
+          <span class="card-tab-icon">⚡</span>Perché succede
+        </div>
+        <div class="card-tab tab-risposte" onclick="switchTab('${cardId}','risposte',this)">
+          <span class="card-tab-icon">💡</span>Possibili Risposte
+        </div>
+        <div class="card-tab tab-azioni" onclick="switchTab('${cardId}','azioni',this)">
+          <span class="card-tab-icon">🔄</span>Cosa si sta facendo
+        </div>
+        <div class="card-tab tab-impatti" onclick="switchTab('${cardId}','impatti',this)">
+          <span class="card-tab-icon">🎯</span>Effetti attesi
+        </div>
+      </div>
+      <div class="card-tab-content active" id="${cardId}-situazione">
+        <div class="tab-intro">Descrizione della criticità osservata sul territorio</div>
+        <div class="tab-items">${renderBullets(row.spiegazione, 'situazione')}</div>
+      </div>
+      <div class="card-tab-content" id="${cardId}-pressioni">
+        <div class="tab-intro">Le cause dirette e strutturali che determinano o aggravano questa criticità</div>
+        <div class="tab-items">${renderBullets(row.pressioni, 'pressioni')}</div>
+      </div>
+      <div class="card-tab-content" id="${cardId}-risposte">
+        <div class="tab-intro">Le azioni proposte dai diversi attori per affrontare la criticità</div>
+        <div class="tab-items">${renderRisposte(row.risposte)}</div>
+      </div>
+      <div class="card-tab-content" id="${cardId}-azioni">
+        <div class="tab-intro">Le azioni già avviate o in corso di attuazione da parte dell'Amministrazione</div>
+        <div class="tab-items">${renderAzioni(row.azioni_in_corso)}</div>
+      </div>
+      <div class="card-tab-content" id="${cardId}-impatti">
+        <div class="tab-intro">Gli effetti positivi attesi se le risposte vengono attuate</div>
+        <div class="tab-items">${renderBullets(row.impatti, 'impatti')}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderBullets(text, type) {
+  if (!text) return '<div class="tab-item"><div class="tab-item-bullet bullet-'+type+'"></div><span>Dato non disponibile</span></div>';
+  return text.split('\n').filter(l=>l.trim()).map(line => {
+    const clean = line.replace(/^[•\-\*]\s*/, '');
+    return `<div class="tab-item"><div class="tab-item-bullet bullet-${type}"></div><span>${esc(clean)}</span></div>`;
+  }).join('');
+}
+
+function renderAzioni(text) {
+  if (!text || !text.trim()) return `<div class="tab-item" style="color:var(--ink-muted);font-style:italic">
+    <div class="tab-item-bullet bullet-azioni"></div>
+    <span>Nessuna azione ancora registrata — aggiorna il Google Sheet per inserire le azioni in corso.</span>
+  </div>`;
+  return text.split('\n').filter(l=>l.trim()).map(line => {
+    const clean = line.replace(/^[•\-\*\d\.]\s*/, '').trim();
+    return `<div class="tab-item"><div class="tab-item-bullet bullet-azioni"></div><span>${esc(clean)}</span></div>`;
+  }).join('');
+}
+
+function renderRisposte(text) {
+  if (!text) return '<div class="tab-item"><div class="tab-item-bullet bullet-risposte"></div><span>Dato non disponibile</span></div>';
+  return text.split('\n').filter(l=>l.trim()).map(line => {
+    const isInfra = line.includes('[Infrastruttura]');
+    const clean = line.replace(/^\d+\.\s*/, '').replace('[Infrastruttura]', '').trim();
+    const num = (line.match(/^(\d+)\./) || [])[1] || '•';
+    const infraTag = isInfra ? `<span class="infra-tag">Infrastruttura</span>` : '';
+    return `<div class="tab-item">
+      <span class="tab-item-num">${num}.</span>
+      <span>${esc(clean)}${infraTag}</span>
+    </div>`;
+  }).join('');
+}
+
+function toggleCard(cardId) {
+  const body = document.getElementById('body-' + cardId);
+  const toggle = document.getElementById('toggle-' + cardId);
+  body.classList.toggle('open');
+  toggle.classList.toggle('open');
+}
+
+function switchTab(cardId, tabName, el) {
+  // deactivate all tabs and contents in this card
+  const card = document.getElementById(cardId);
+  card.querySelectorAll('.card-tab').forEach(t=>t.classList.remove('active'));
+  card.querySelectorAll('.card-tab-content').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(cardId + '-' + tabName).classList.add('active');
+}
+
+function expandCard(cardId) {
+  const body = document.getElementById('body-' + cardId);
+  const toggle = document.getElementById('toggle-' + cardId);
+  if (body && !body.classList.contains('open')) {
+    body.classList.add('open');
+    toggle.classList.add('open');
+  }
+}
+
+function setSyncStatus(state, msg) {
+  const dot = document.getElementById('syncDot');
+  const txt = document.getElementById('syncText');
+  dot.className = 'sync-dot';
+  if (state==='loading') dot.classList.add('loading');
+  else if (state==='error') dot.classList.add('error');
+  txt.textContent = msg;
+}
+
+function openConfig() { document.getElementById('sheetUrlInput').value=SHEET_URL; document.getElementById('configPanel').classList.add('open'); }
+function closeConfig() { document.getElementById('configPanel').classList.remove('open'); }
+function saveConfig() {
+  const url = document.getElementById('sheetUrlInput').value.trim();
+  if (!url) { alert('Inserisci un URL valido.'); return; }
+  SHEET_URL = url; localStorage.setItem(STORAGE_KEY, url);
+  closeConfig();
+  document.getElementById('temaFilter').innerHTML = '<option value="all">Tutti i temi</option>';
+  loadFromSheet();
+}
+
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+</script>
+</body>
+</html>
